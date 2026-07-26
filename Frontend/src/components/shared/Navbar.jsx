@@ -23,9 +23,9 @@ const Navbar = () => {
         </div>
         <div className="flex items-center gap-12">
           <ul className="flex font-medium items-center gap-5">
-            <li>Home</li>
-            <li>Jobs</li>
-            <li>Browse</li>
+            <li><Link to='/' className="hover:text-[#6A38C2] transition-colors duration-200">Home</Link></li>
+            <li><Link to='/jobs' className="hover:text-[#6A38C2] transition-colors duration-200">Jobs</Link></li>
+            <li><Link to='/browse' className="hover:text-[#6A38C2] transition-colors duration-200">Browse</Link></li>
           </ul>
           {!user ? (
             <div className="flex items-center gap-2" >
