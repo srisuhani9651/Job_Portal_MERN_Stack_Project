@@ -9,7 +9,7 @@ import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { RadioGroup } from "../ui/radio-group";
 import { useDispatch, useSelector } from "react-redux";
-import { setLoading } from "@/Redux/authSlice";
+import { setLoading, setUser } from "@/Redux/authSlice";
 import store from "@/Redux/store";
 import { Loader2 } from "lucide-react";
 
@@ -36,6 +36,7 @@ const Login = () => {
         withCredentials: true
       })
       if(res.data.success){
+        dispatch(setUser(res.data.user))
         navigate("/")
         toast.success(res.data.message)
       }
