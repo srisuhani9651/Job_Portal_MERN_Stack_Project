@@ -12,7 +12,6 @@ Built using React, Node.js, Express, MongoDB, and Tailwind CSS.
 - Protected Routes
 
 ## Tech Stack
-
 Frontend
 - React
 - JavaScript
