@@ -10,3 +10,22 @@ Built using React, Node.js, Express, MongoDB, and Tailwind CSS.
 - Apply for Jobs
 - Responsive Design
 - Protected Routes
+
+## Tech Stack
+
+Frontend
+- React
+- JavaScript
+- Tailwind CSS
+- Redux Toolkit
+
+Backend
+- Node.js
+- Express.js
+
+Database
+- MongoDB
+
+Tools
+- Git
+- GitHub
