@@ -1,31 +1,79 @@
 import React from "react";
 import { Badge } from "./ui/badge";
+import { MapPin, Briefcase, IndianRupee, ArrowUpRight, Building2 } from "lucide-react";
 
-const LatestJobCards = () => {
+const LatestJobCards = ({ job }) => {
+  const companyName = job?.company?.name || job?.companyName || "TechCorp Solutions";
+  const location = job?.location || "Bangalore, India";
+  const title = job?.title || "Senior Full Stack Developer";
+  const description =
+    job?.description ||
+    "Seeking a skilled Full Stack Developer to build scalable web applications, collaborate with cross-functional teams, and deliver robust frontend and backend code.";
+  const position = job?.position || "12 Openings";
+  const jobType = job?.jobType || "Full Time";
+  const salary = job?.salary || "24 LPA";
+  const logoUrl = job?.company?.logo || job?.logoUrl;
+
   return (
-    <div className="p-5 rounded-md shadow-xl bg-white border border-gray-100">
+    <div className="group relative bg-white rounded-2xl p-5 sm:p-6 border border-gray-100 shadow-md hover:shadow-xl hover:border-purple-200 transition-all duration-300 ease-out cursor-pointer flex flex-col justify-between overflow-hidden hover:-translate-y-1">
+      {/* Header section with company logo and details */}
       <div>
-        <h1 className="font-medium text-lg">Company Name</h1>
-        <p className="text-sm text-gray-500  ">India</p>
+        <div className="flex items-center justify-between gap-3 mb-3">
+          <div className="flex items-center gap-3">
+            <div className="w-11 h-11 rounded-xl bg-purple-50 border border-purple-100 flex items-center justify-center text-purple-600 font-bold text-lg shadow-xs group-hover:scale-105 transition-transform duration-300 overflow-hidden shrink-0">
+              {logoUrl ? (
+                <img src={logoUrl} alt={companyName} className="w-full h-full object-cover" />
+              ) : (
+                <Building2 className="w-5 h-5 text-[#6A38C2]" />
+              )}
+            </div>
+            <div>
+              <h1 className="font-semibold text-base sm:text-lg text-gray-900 line-clamp-1 group-hover:text-[#6A38C2] transition-colors">
+                {companyName}
+              </h1>
+              <p className="text-xs sm:text-sm text-gray-500 flex items-center gap-1 mt-0.5">
+                <MapPin className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+                <span>{location}</span>
+              </p>
+            </div>
+          </div>
+          <div className="w-8 h-8 rounded-full bg-gray-50 group-hover:bg-purple-50 flex items-center justify-center text-gray-400 group-hover:text-[#6A38C2] transition-all duration-300 shrink-0">
+            <ArrowUpRight className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-300" />
+          </div>
+        </div>
+
+        {/* Job Title & Description */}
+        <div className="mt-3">
+          <h2 className="font-bold text-lg sm:text-xl text-gray-900 group-hover:text-[#6A38C2] transition-colors duration-200 line-clamp-1">
+            {title}
+          </h2>
+          <p className="text-xs sm:text-sm text-gray-600 mt-2 line-clamp-2 sm:line-clamp-3 leading-relaxed font-normal">
+            {description}
+          </p>
+        </div>
       </div>
-      <div>
-        <h1 className="font-bold text-lg my-2 ">Job Title</h1>
-        <p className="text-sm text-gray-600">
-          We are seeking a versatile Full Stack Developer to join our dynamic
-          engineering team. In this role, you will be responsible for the
-          end-to-end development of our web applications, bridging the gap
-          between elegant frontend interfaces and robust backend architecture.
-        </p>
-      </div>
-      <div className="flex item-center gap-2 mt-4">
-        <Badge className="text-blue-700 font-bold" variant="ghost">
-          12 Positions
+
+      {/* Badges section */}
+      <div className="flex flex-wrap items-center gap-2 sm:gap-2.5 mt-5 pt-4 border-t border-gray-100">
+        <Badge
+          className="bg-blue-50 text-blue-700 border-blue-200/70 font-semibold text-xs px-2.5 py-1 rounded-full flex items-center gap-1 shadow-2xs hover:bg-blue-100 transition-colors"
+          variant="outline"
+        >
+          <Briefcase className="w-3 h-3" />
+          {position}
         </Badge>
-        <Badge className="text-[#F83002] font-bold" variant="ghost">
-          Part Time
+        <Badge
+          className="bg-amber-50 text-amber-700 border-amber-200/70 font-semibold text-xs px-2.5 py-1 rounded-full flex items-center gap-1 shadow-2xs hover:bg-amber-100 transition-colors"
+          variant="outline"
+        >
+          {jobType}
         </Badge>
-        <Badge className="text-[#7209b7] font-bold" variant="ghost">
-          24 LPA
+        <Badge
+          className="bg-purple-50 text-[#7209b7] border-purple-200/70 font-semibold text-xs px-2.5 py-1 rounded-full flex items-center gap-1 shadow-2xs hover:bg-purple-100 transition-colors"
+          variant="outline"
+        >
+          <IndianRupee className="w-3 h-3" />
+          {salary}
         </Badge>
       </div>
     </div>
@@ -33,3 +81,4 @@ const LatestJobCards = () => {
 };
 
 export default LatestJobCards;
+

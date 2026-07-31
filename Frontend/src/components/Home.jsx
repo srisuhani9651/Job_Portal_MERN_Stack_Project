@@ -5,16 +5,15 @@ import CategoryCarousel from './CategoryCarousel'
 import LatestJobs from './LatestJobs'
 import Footer from './Footer'
 
-
 const Home = () => {
   return (
-  <div>
-  <Navbar></Navbar>,
-  <HeroSection></HeroSection>,
-  <CategoryCarousel></CategoryCarousel>,
-  <LatestJobs></LatestJobs>,
-  <Footer></Footer>
-  </div>
+    <div>
+      <Navbar />
+      <HeroSection />
+      <CategoryCarousel />
+      <LatestJobs />
+      <Footer />
+    </div>
   )
 }
 
