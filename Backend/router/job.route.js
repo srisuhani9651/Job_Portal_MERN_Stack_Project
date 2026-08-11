@@ -1,16 +1,18 @@
-import express from 'express'
-import { postJob, getAllJobs, getJobById, getRecruiterJobs } from '../controller/job.controller.js'
-import {isAuthenticated} from '../middleware/isAuthenticated.js'
+import express from "express";
+import {
+  postJob,
+  getAllJobs,
+  getJobById,
+  getRecruiterJobs,
+} from "../controller/job.controller.js";
+import { isAuthenticated } from "../middleware/isAuthenticated.js";
 
-const router = express.Router()
+const router = express.Router();
 
-router.post('/postJobs',isAuthenticated, postJob)
+router.post("/postJobs", isAuthenticated, postJob);
+router.get("/get", isAuthenticated, getAllJobs);
+router.get("/get/jobs", isAuthenticated, getAllJobs);
+router.get("/get/job/:id", isAuthenticated, getJobById);
+router.get("/recruiter/jobs", isAuthenticated, getRecruiterJobs);
 
-router.get('/get/jobs',isAuthenticated, getAllJobs)
-
-router.get('/get/job/:id',isAuthenticated, getJobById)
-
-router.get('/recruiter/jobs',isAuthenticated, getRecruiterJobs)
-
-
-export default router
+export default router;

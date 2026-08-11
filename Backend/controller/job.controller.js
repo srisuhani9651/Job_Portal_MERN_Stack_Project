@@ -64,7 +64,7 @@ export const getAllJobs = async (req, res) => {
       .populate({
         path: "company",
       })
-      .sort({ cretaedAt: -1 });
+      .sort({ createdAt: -1 });
     if (!jobs) {
       return res.status(404).json({ message: "No job found", success: false });
     }
