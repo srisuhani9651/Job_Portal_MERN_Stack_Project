@@ -12,7 +12,7 @@ router.post('/login', login)
 
 router.get('/logout', logout)
 
-router.post('/profile/update',isAuthenticated, updateprofile)
+router.post('/profile/update', isAuthenticated, singleUpload, updateprofile)
 
 router.post('/changePassword', changePassword)
 

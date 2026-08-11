@@ -113,28 +113,32 @@ export const logout = async (req, res) => {
 export const updateprofile = async (req, res) => {
   try {
     const { fullName, email, phoneNumber, bio, skills } = req.body;
-    // const file = req.file;
+    const file = req.file;
 
-    //cloudinary comes here(jo file milegi usko yha setup krege)
     let skillsArray;
     if (skills) {
       skillsArray = skills.split(",");
     }
-    const userId = req.id
+    const userId = req.id;
     const user = await User.findById(userId);
     if (!user) {
       return res
         .status(400)
         .json({ message: `User not found`, success: false });
     }
-    //update data
+    // update data
     if (fullName) user.fullName = fullName;
     if (email) user.email = email;
     if (phoneNumber) user.phoneNumber = phoneNumber;
     if (bio) user.profile.bio = bio;
     if (skills) user.profile.skills = skillsArray;
 
-    //resume upload later on
+    // file upload (resume)
+    if (file) {
+      const fileUri = `data:${file.mimetype};base64,${file.buffer.toString("base64")}`;
+      user.profile.resume = fileUri;
+      user.profile.resumeOriginalName = file.originalname;
+    }
 
     await user.save();
 
@@ -148,9 +152,10 @@ export const updateprofile = async (req, res) => {
     };
     return res
       .status(200)
-      .json({ message: `Profile updated successfully`, user:updatedUser, success: true });
+      .json({ message: `Profile updated successfully`, user: updatedUser, success: true });
   } catch (error) {
-    return res.status(500).json({ message: error.message, success:false });
+    console.log(error);
+    return res.status(500).json({ message: error.message, success: false });
   }
 };
 
