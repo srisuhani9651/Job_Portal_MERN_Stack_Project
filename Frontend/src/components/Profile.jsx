@@ -13,12 +13,12 @@ const Profile = () => {
   const [open, setOpen] = useState(false);
   const { user } = useSelector((store) => store.auth);
 
-  // Fallback skills handling
+  // Skills handling
   const skills = Array.isArray(user?.profile?.skills)
     ? user.profile.skills
     : user?.profile?.skills
     ? user.profile.skills.split(",")
-    : ["HTML", "CSS", "JavaScript", "React.js"];
+    : [];
 
   const hasResume = Boolean(user?.profile?.resume);
 
@@ -160,12 +160,14 @@ const Profile = () => {
                 <a
                   target="_blank"
                   rel="noopener noreferrer"
-                  href={user?.profile?.resume}
+                  // resume url is receiving here>
+                  href={user?.profile?.resume} 
                   className="inline-flex items-center gap-2 text-sm font-semibold text-purple-600 hover:text-purple-700 bg-purple-50 hover:bg-purple-100 border border-purple-200/60 px-4 py-2 rounded-xl transition-all group"
                 >
                   <FileText className="w-4 h-4 text-purple-600 group-hover:scale-110 transition-transform" />
                   <span className="underline underline-offset-2">
-                    {user?.profile?.resumeOriginalName || "View Uploaded Resume"}
+                    {/* showing original resume name */}
+                    {user?.profile?.resumeOriginalName || "View Uploaded Resume"} 
                   </span>
                 </a>
               ) : (

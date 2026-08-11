@@ -2,12 +2,13 @@ import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import axios from "axios";
 import { toast } from "sonner";
-import { Loader2, X, Upload } from "lucide-react";
+import { Loader2, X, Upload, FileText, Camera } from "lucide-react";
 import { USER_API } from "@/utils/constant";
 import { setUser } from "@/Redux/authSlice";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
+import { Avatar, AvatarImage, AvatarFallback } from "./ui/avatar";
 
 const UpdateProfileDialog = ({ open, setOpen }) => {
   const { user } = useSelector((store) => store.auth);
@@ -15,16 +16,18 @@ const UpdateProfileDialog = ({ open, setOpen }) => {
   const [loading, setLoading] = useState(false);
 
   const [input, setInput] = useState({
-    fullName: user?.fullName || user?.fullname || "",
-    email: user?.email || "",
-    phoneNumber: user?.phoneNumber || "",
-    bio: user?.profile?.bio || "",
-    skills: Array.isArray(user?.profile?.skills)
-      ? user.profile.skills.join(",")
-      : user?.profile?.skills || "",
-    file: null,
+    fullName: "",
+    email: "",
+    phoneNumber: "",
+    bio: "",
+    skills: "",
+    profilePhoto: null,
+    resume: null,
   });
 
+  const [photoPreview, setPhotoPreview] = useState("");
+
+  // Sync state whenever dialog opens or user data changes
   useEffect(() => {
     if (user) {
       setInput({
@@ -33,22 +36,38 @@ const UpdateProfileDialog = ({ open, setOpen }) => {
         phoneNumber: user?.phoneNumber || "",
         bio: user?.profile?.bio || "",
         skills: Array.isArray(user?.profile?.skills)
-          ? user.profile.skills.join(",")
+          ? user.profile.skills.join(", ")
           : user?.profile?.skills || "",
-        file: null,
+        profilePhoto: null,
+        resume: null,
       });
+      setPhotoPreview(user?.profile?.profilePhoto || "");
     }
   }, [user, open]);
 
+  // Handle text input changes
   const changeEventHandler = (e) => {
     setInput({ ...input, [e.target.name]: e.target.value });
   };
 
-  const fileChangeHandler = (e) => {
+  // Handle profile photo selection
+  const photoChangeHandler = (e) => {
     const file = e.target.files?.[0];
-    setInput({ ...input, file });
+    if (file) {
+      setInput({ ...input, profilePhoto: file });
+      setPhotoPreview(URL.createObjectURL(file));
+    }
   };
 
+  // Handle resume selection
+  const resumeChangeHandler = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setInput({ ...input, resume: file });
+    }
+  };
+
+  // Submit updated profile
   const submitHandler = async (e) => {
     e.preventDefault();
     const formData = new FormData();
@@ -57,24 +76,27 @@ const UpdateProfileDialog = ({ open, setOpen }) => {
     formData.append("phoneNumber", input.phoneNumber);
     formData.append("bio", input.bio);
     formData.append("skills", input.skills);
-    if (input.file) {
-      formData.append("file", input.file);
+
+    if (input.profilePhoto) {
+      formData.append("profilePhoto", input.profilePhoto);
     }
+    if (input.resume) {
+      formData.append("resume", input.resume);
+    }
+
     try {
       setLoading(true);
       const res = await axios.post(`${USER_API}/profile/update`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
+        headers: { "Content-Type": "multipart/form-data" },
         withCredentials: true,
       });
+
       if (res.data?.success) {
         dispatch(setUser(res.data.user));
         toast.success(res.data.message || "Profile updated successfully!");
         setOpen(false);
       }
     } catch (error) {
-      console.error("Profile update error:", error);
       toast.error(error.response?.data?.message || "Failed to update profile");
     } finally {
       setLoading(false);
@@ -83,20 +105,31 @@ const UpdateProfileDialog = ({ open, setOpen }) => {
 
   if (!open) return null;
 
+  const getInitials = (name) => {
+    if (!name) return "U";
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 sm:p-6 transition-all duration-300">
-      <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl space-y-6 max-h-[90vh] overflow-y-auto border border-gray-100 relative animate-in zoom-in-95 duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+      <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-5 max-h-[90vh] overflow-y-auto border border-gray-100 relative">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-gray-100 pb-4">
+        <div className="flex items-center justify-between border-b pb-3">
           <div>
             <h2 className="text-xl font-bold text-gray-900">Update Profile</h2>
             <p className="text-xs text-gray-500 mt-0.5">
-              Make changes to your personal details and skills below.
+              Update your photo, personal details, skills, and resume.
             </p>
           </div>
           <button
+            type="button"
             onClick={() => setOpen(false)}
-            className="p-2 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-full transition-colors cursor-pointer"
+            className="p-1.5 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-full transition cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -104,7 +137,45 @@ const UpdateProfileDialog = ({ open, setOpen }) => {
 
         {/* Form */}
         <form onSubmit={submitHandler} className="space-y-4">
-          <div>
+          {/* Profile Picture Upload Section */}
+          <div className="flex items-center gap-4 p-3 bg-purple-50/50 border border-purple-100 rounded-2xl">
+            <div className="relative group shrink-0">
+              <Avatar className="h-16 w-16 border-2 border-purple-200 shadow-sm">
+                <AvatarImage src={photoPreview} alt={input.fullName} className="object-cover" />
+                <AvatarFallback className="bg-purple-600 text-white font-bold text-lg">
+                  {getInitials(input.fullName)}
+                </AvatarFallback>
+              </Avatar>
+              <label
+                htmlFor="profile-photo-input"
+                className="absolute inset-0 bg-black/40 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+              >
+                <Camera className="w-5 h-5" />
+              </label>
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-xs font-semibold text-gray-800">Profile Photo</p>
+              <p className="text-[11px] text-gray-500 mb-1">JPG, PNG, or WebP</p>
+              <label
+                htmlFor="profile-photo-input"
+                className="inline-flex items-center gap-1.5 text-xs font-medium text-[#6A38C2] hover:text-purple-700 hover:underline cursor-pointer truncate max-w-full"
+              >
+                <Upload className="w-3.5 h-3.5 shrink-0" />
+                <span className="truncate">
+                  {input.profilePhoto ? input.profilePhoto.name : "Upload new photo"}
+                </span>
+              </label>
+              <input
+                id="profile-photo-input"
+                type="file"
+                accept="image/*"
+                onChange={photoChangeHandler}
+                className="hidden"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-1">
             <Label className="text-xs font-semibold text-gray-700">Full Name</Label>
             <Input
               type="text"
@@ -112,83 +183,89 @@ const UpdateProfileDialog = ({ open, setOpen }) => {
               value={input.fullName}
               onChange={changeEventHandler}
               placeholder="e.g. Suhani Srivastava"
-              className="mt-1 border-gray-200 focus:border-[#6A38C2] rounded-xl"
+              required
             />
           </div>
 
-          <div>
-            <Label className="text-xs font-semibold text-gray-700">Email Address</Label>
-            <Input
-              type="email"
-              name="email"
-              value={input.email}
-              onChange={changeEventHandler}
-              placeholder="e.g. suhani@gmail.com"
-              className="mt-1 border-gray-200 focus:border-[#6A38C2] rounded-xl"
-            />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="space-y-1">
+              <Label className="text-xs font-semibold text-gray-700">Email Address</Label>
+              <Input
+                type="email"
+                name="email"
+                value={input.email}
+                onChange={changeEventHandler}
+                placeholder="suhani@gmail.com"
+                required
+              />
+            </div>
+
+            <div className="space-y-1">
+              <Label className="text-xs font-semibold text-gray-700">Phone Number</Label>
+              <Input
+                type="tel"
+                name="phoneNumber"
+                value={input.phoneNumber}
+                onChange={changeEventHandler}
+                placeholder="9876543210"
+              />
+            </div>
           </div>
 
-          <div>
-            <Label className="text-xs font-semibold text-gray-700">Phone Number</Label>
-            <Input
-              type="text"
-              name="phoneNumber"
-              value={input.phoneNumber}
-              onChange={changeEventHandler}
-              placeholder="e.g. 9876543210"
-              className="mt-1 border-gray-200 focus:border-[#6A38C2] rounded-xl"
-            />
-          </div>
-
-          <div>
+          <div className="space-y-1">
             <Label className="text-xs font-semibold text-gray-700">Bio</Label>
             <Input
               type="text"
               name="bio"
               value={input.bio}
               onChange={changeEventHandler}
-              placeholder="Full stack web developer passionate about building web apps"
-              className="mt-1 border-gray-200 focus:border-[#6A38C2] rounded-xl"
+              placeholder="Full-stack developer enthusiastic about building modern web apps"
             />
           </div>
 
-          <div>
+          <div className="space-y-1">
             <Label className="text-xs font-semibold text-gray-700">
-              Skills <span className="text-gray-400 font-normal">(Comma separated)</span>
+              Skills <span className="text-gray-400 font-normal">(comma separated)</span>
             </Label>
             <Input
               type="text"
               name="skills"
               value={input.skills}
               onChange={changeEventHandler}
-              placeholder="React, Node.js, MongoDB, TailwindCSS"
-              className="mt-1 border-gray-200 focus:border-[#6A38C2] rounded-xl"
+              placeholder="React, Node.js, MongoDB, Express"
             />
           </div>
 
-          <div>
-            <Label className="text-xs font-semibold text-gray-700">Resume File (PDF)</Label>
-            <div className="mt-1 flex items-center justify-between border border-dashed border-gray-300 rounded-xl p-3 bg-gray-50 hover:bg-purple-50/50 transition-colors">
-              <div className="flex items-center gap-2 text-xs text-gray-600 truncate">
-                <Upload className="w-4 h-4 text-purple-600 shrink-0" />
-                <span className="truncate">
-                  {input.file ? input.file.name : "Upload new resume (PDF)"}
+          {/* Resume Upload */}
+          <div className="space-y-1">
+            <Label className="text-xs font-semibold text-gray-700">Resume (PDF)</Label>
+            <div className="flex items-center justify-between border border-dashed border-gray-300 rounded-xl p-3 bg-gray-50/70 hover:bg-purple-50/40 transition">
+              <div className="flex items-center gap-2 text-xs text-gray-600 truncate mr-2">
+                {input.resume ? (
+                  <FileText className="w-4 h-4 text-[#6A38C2] shrink-0" />
+                ) : (
+                  <Upload className="w-4 h-4 text-gray-400 shrink-0" />
+                )}
+                <span className="truncate font-medium text-gray-700">
+                  {input.resume
+                    ? input.resume.name
+                    : user?.profile?.resumeOriginalName || "Upload resume (PDF)"}
                 </span>
               </div>
-              <label className="text-xs font-medium text-[#6A38C2] hover:underline cursor-pointer shrink-0">
+              <label className="text-xs font-semibold text-[#6A38C2] hover:text-purple-700 hover:underline cursor-pointer shrink-0">
                 Browse
                 <input
                   type="file"
                   accept="application/pdf"
-                  onChange={fileChangeHandler}
+                  onChange={resumeChangeHandler}
                   className="hidden"
                 />
               </label>
             </div>
           </div>
 
-          {/* Action Buttons */}
-          <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-100">
+          {/* Footer Actions */}
+          <div className="flex items-center justify-end gap-3 pt-4 border-t">
             <Button
               type="button"
               variant="outline"
@@ -200,7 +277,7 @@ const UpdateProfileDialog = ({ open, setOpen }) => {
             <Button
               type="submit"
               disabled={loading}
-              className="bg-gradient-to-r from-[#6A38C2] to-purple-600 hover:from-purple-700 hover:to-[#5b30a6] text-white rounded-xl px-6 cursor-pointer shadow-md shadow-purple-200"
+              className="bg-[#6A38C2] hover:bg-[#5b30a6] text-white rounded-xl px-6 cursor-pointer"
             >
               {loading ? (
                 <div className="flex items-center gap-2">
