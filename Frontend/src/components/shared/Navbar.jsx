@@ -15,6 +15,7 @@ import {
   ChevronRight,
   Shield,
   GraduationCap,
+  Building2,
 } from "lucide-react";
 import { USER_API } from "@/utils/constant";
 import { setUser } from "@/Redux/authSlice";
@@ -51,11 +52,20 @@ const Navbar = () => {
     }
   };
 
-  const navLinks = [
+  const isRecruiter = user && (user?.role === "Recruiter" || user?.role?.toLowerCase() === "recruiter");
+
+  const studentLinks = [
     { name: "Home", path: "/", icon: HomeIcon },
     { name: "Jobs", path: "/jobs", icon: Briefcase },
     { name: "Browse", path: "/browse", icon: Compass },
   ];
+
+  const recruiterLinks = [
+    { name: "Companies", path: "/admin/companies", icon: Building2 },
+    { name: "Jobs", path: "/admin/jobs", icon: Briefcase },
+  ];
+
+  const navLinks = isRecruiter ? recruiterLinks : studentLinks;
 
   const userName = user?.fullName || user?.fullname || "";
 
@@ -72,7 +82,7 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 sm:h-20">
           {/* Logo Section */}
-          <Link to="/" className="flex items-center gap-2.5 group cursor-pointer">
+          <Link to={isRecruiter ? "/admin/companies" : "/"} className="flex items-center gap-2.5 group cursor-pointer">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#6A38C2] via-purple-600 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-purple-500/20 group-hover:scale-105 transition-all duration-300">
               <Briefcase className="w-5 h-5" />
             </div>
@@ -85,7 +95,10 @@ const Navbar = () => {
           <nav className="hidden md:flex items-center gap-6">
             <ul className="flex items-center gap-2">
               {navLinks.map((link) => {
-                const isActive = location.pathname === link.path;
+                const isActive =
+                  link.path === "/"
+                    ? location.pathname === "/"
+                    : location.pathname.startsWith(link.path);
                 const IconComponent = link.icon;
                 return (
                   <li key={link.path}>
@@ -173,18 +186,20 @@ const Navbar = () => {
 
                   {/* Menu Options */}
                   <div className="p-2 space-y-1">
-                    <Link
-                      to="/profile"
-                      className="flex items-center justify-between px-3 py-2.5 text-sm font-medium text-gray-700 hover:bg-purple-50/80 hover:text-[#6A38C2] rounded-xl transition-colors cursor-pointer group"
-                    >
-                      <div className="flex items-center gap-2.5">
-                        <div className="p-1.5 rounded-lg bg-purple-100/60 text-[#6A38C2]">
-                          <User2 className="w-4 h-4" />
+                    {!isRecruiter && (
+                      <Link
+                        to="/profile"
+                        className="flex items-center justify-between px-3 py-2.5 text-sm font-medium text-gray-700 hover:bg-purple-50/80 hover:text-[#6A38C2] rounded-xl transition-colors cursor-pointer group"
+                      >
+                        <div className="flex items-center gap-2.5">
+                          <div className="p-1.5 rounded-lg bg-purple-100/60 text-[#6A38C2]">
+                            <User2 className="w-4 h-4" />
+                          </div>
+                          <span>View Profile</span>
                         </div>
-                        <span>View Profile</span>
-                      </div>
-                      <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-[#6A38C2] transition-colors" />
-                    </Link>
+                        <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-[#6A38C2] transition-colors" />
+                      </Link>
+                    )}
 
                     <button
                       onClick={logoutHandler}
@@ -207,14 +222,25 @@ const Navbar = () => {
           {/* Mobile Menu Toggle */}
           <div className="flex items-center gap-2 md:hidden">
             {user && (
-              <Link to="/profile" className="mr-1">
-                <Avatar className="h-8 w-8 border border-purple-200">
-                  <AvatarImage src={user?.profile?.profilePhoto} alt={userName} />
-                  <AvatarFallback className="bg-purple-100 text-[#6A38C2] text-xs font-bold">
-                    {getInitials(userName)}
-                  </AvatarFallback>
-                </Avatar>
-              </Link>
+              !isRecruiter ? (
+                <Link to="/profile" className="mr-1">
+                  <Avatar className="h-8 w-8 border border-purple-200">
+                    <AvatarImage src={user?.profile?.profilePhoto} alt={userName} />
+                    <AvatarFallback className="bg-purple-100 text-[#6A38C2] text-xs font-bold">
+                      {getInitials(userName)}
+                    </AvatarFallback>
+                  </Avatar>
+                </Link>
+              ) : (
+                <div className="mr-1">
+                  <Avatar className="h-8 w-8 border border-purple-200">
+                    <AvatarImage src={user?.profile?.profilePhoto} alt={userName} />
+                    <AvatarFallback className="bg-purple-100 text-[#6A38C2] text-xs font-bold">
+                      {getInitials(userName)}
+                    </AvatarFallback>
+                  </Avatar>
+                </div>
+              )
             )}
             <Button
               variant="ghost"
@@ -234,7 +260,10 @@ const Navbar = () => {
         <div className="md:hidden bg-white/95 backdrop-blur-xl border-b border-purple-100 px-4 pt-3 pb-6 space-y-4 shadow-xl animate-in slide-in-from-top duration-200">
           <ul className="flex flex-col space-y-1.5">
             {navLinks.map((link) => {
-              const isActive = location.pathname === link.path;
+              const isActive =
+                link.path === "/"
+                  ? location.pathname === "/"
+                  : location.pathname.startsWith(link.path);
               const IconComponent = link.icon;
               return (
                 <li key={link.path}>
@@ -294,14 +323,16 @@ const Navbar = () => {
                 </div>
 
                 <div className="flex flex-col gap-1">
-                  <Link
-                    to="/profile"
-                    onClick={() => setMenuOpen(false)}
-                    className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-gray-700 hover:bg-purple-50 hover:text-[#6A38C2] rounded-xl transition-colors"
-                  >
-                    <User2 className="w-4 h-4 text-[#6A38C2]" />
-                    <span>View Profile</span>
-                  </Link>
+                  {!isRecruiter && (
+                    <Link
+                      to="/profile"
+                      onClick={() => setMenuOpen(false)}
+                      className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-gray-700 hover:bg-purple-50 hover:text-[#6A38C2] rounded-xl transition-colors"
+                    >
+                      <User2 className="w-4 h-4 text-[#6A38C2]" />
+                      <span>View Profile</span>
+                    </Link>
+                  )}
                   <button
                     onClick={() => {
                       setMenuOpen(false);

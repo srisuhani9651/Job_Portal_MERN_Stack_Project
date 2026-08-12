@@ -1,21 +1,33 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import { Badge } from "./ui/badge";
 import { MapPin, Briefcase, IndianRupee, ArrowUpRight, Building2 } from "lucide-react";
 
 const LatestJobCards = ({ job }) => {
+  const navigate = useNavigate();
+
   const companyName = job?.company?.name || job?.companyName || "TechCorp Solutions";
   const location = job?.location || "Bangalore, India";
   const title = job?.title || "Senior Full Stack Developer";
   const description =
     job?.description ||
     "Seeking a skilled Full Stack Developer to build scalable web applications, collaborate with cross-functional teams, and deliver robust frontend and backend code.";
-  const position = job?.position || "12 Openings";
+  const position = job?.position ? `${job.position} Openings` : "12 Openings";
   const jobType = job?.jobType || "Full Time";
-  const salary = job?.salary || "24 LPA";
+  const salary = job?.salary ? `${job.salary} LPA` : "24 LPA";
   const logoUrl = job?.company?.logo || job?.logoUrl;
 
+  const handleCardClick = () => {
+    if (job?._id) {
+      navigate(`/description/${job._id}`);
+    }
+  };
+
   return (
-    <div className="group relative bg-white rounded-2xl p-5 sm:p-6 border border-gray-100 shadow-md hover:shadow-xl hover:border-purple-200 transition-all duration-300 ease-out cursor-pointer flex flex-col justify-between overflow-hidden hover:-translate-y-1">
+    <div
+      onClick={handleCardClick}
+      className="group relative bg-white rounded-2xl p-5 sm:p-6 border border-gray-100 shadow-md hover:shadow-xl hover:border-purple-200 transition-all duration-300 ease-out cursor-pointer flex flex-col justify-between overflow-hidden hover:-translate-y-1"
+    >
       {/* Header section with company logo and details */}
       <div>
         <div className="flex items-center justify-between gap-3 mb-3">
@@ -81,4 +93,3 @@ const LatestJobCards = ({ job }) => {
 };
 
 export default LatestJobCards;
-

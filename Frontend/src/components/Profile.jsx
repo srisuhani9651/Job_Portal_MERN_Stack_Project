@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import { Contact, Mail, Pen, FileText, Sparkles, BadgeCheck } from "lucide-react";
 import AppliedJobTable from "./AppliedJobTable";
 import Navbar from "./shared/Navbar";
@@ -12,6 +13,13 @@ import { Button } from "./ui/button";
 const Profile = () => {
   const [open, setOpen] = useState(false);
   const { user } = useSelector((store) => store.auth);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (user && (user?.role === "Recruiter" || user?.role?.toLowerCase() === "recruiter")) {
+      navigate("/admin/companies");
+    }
+  }, [user, navigate]);
 
   // Skills handling
   const skills = Array.isArray(user?.profile?.skills)
