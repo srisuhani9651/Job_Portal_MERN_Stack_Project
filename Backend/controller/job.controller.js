@@ -93,7 +93,9 @@ export const getJobById = async (req, res) => {
 export const getRecruiterJobs = async (req, res) => {
   try {
     const recruiterId = req.id;
-    const createdJobs = await Job.find({ created_by: recruiterId });
+    const createdJobs = await Job.find({ created_by: recruiterId })
+      .populate({ path: "company" })
+      .sort({ createdAt: -1 });
     if (!createdJobs) {
       return res.status(404).json({ message: "No job found", success: false });
     }

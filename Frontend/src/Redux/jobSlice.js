@@ -13,8 +13,10 @@ const jobSlice = createSlice({
   name: "jobs",
   initialState: {
     allJobs: [],
+    allAdminJobs: [],
     singleJob: null,
     savedJobs: getInitialSavedJobs(),
+    searchJobByText: "",
     isLoading: false,
     error: null,
   },
@@ -22,8 +24,14 @@ const jobSlice = createSlice({
     setAllJobs: (state, action) => {
       state.allJobs = action.payload;
     },
+    setAllAdminJobs: (state, action) => {
+      state.allAdminJobs = action.payload;
+    },
     setSingleJob: (state, action) => {
       state.singleJob = action.payload;
+    },
+    setSearchJobByText: (state, action) => {
+      state.searchJobByText = action.payload;
     },
     toggleSaveJob: (state, action) => {
       const jobId = action.payload;
@@ -42,5 +50,11 @@ const jobSlice = createSlice({
   },
 });
 
-export const { setAllJobs, setSingleJob, toggleSaveJob } = jobSlice.actions;
+export const {
+  setAllJobs,
+  setAllAdminJobs,
+  setSingleJob,
+  setSearchJobByText,
+  toggleSaveJob,
+} = jobSlice.actions;
 export default jobSlice.reducer;
