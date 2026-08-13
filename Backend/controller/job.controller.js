@@ -104,3 +104,51 @@ export const getRecruiterJobs = async (req, res) => {
     return res.status(500).json({ message: error.message, success: false });
   }
 };
+
+export const updateJob = async (req, res) => {
+  try {
+    const {
+      title,
+      description,
+      requirements,
+      salary,
+      location,
+      jobType,
+      experience,
+      position,
+      companyId,
+    } = req.body;
+    const jobId = req.params.id;
+
+    const updateData = {};
+    if (title) updateData.title = title;
+    if (description) updateData.description = description;
+    if (requirements) {
+      updateData.requirements = Array.isArray(requirements)
+        ? requirements
+        : typeof requirements === "string"
+        ? requirements.split(",").map((r) => r.trim()).filter(Boolean)
+        : [];
+    }
+    if (salary !== undefined) updateData.salary = Number(salary);
+    if (location) updateData.location = location;
+    if (jobType) updateData.jobType = jobType;
+    if (experience !== undefined) updateData.experienceLevel = Number(experience);
+    if (position !== undefined) updateData.position = Number(position);
+    if (companyId) updateData.company = companyId;
+
+    const job = await Job.findByIdAndUpdate(jobId, updateData, {
+      new: true,
+    }).populate({ path: "company" });
+
+    if (!job) {
+      return res.status(404).json({ message: "Job not found", success: false });
+    }
+
+    return res
+      .status(200)
+      .json({ message: "Job updated successfully", job, success: true });
+  } catch (error) {
+    return res.status(500).json({ message: error.message, success: false });
+  }
+};

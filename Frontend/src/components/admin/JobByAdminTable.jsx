@@ -209,16 +209,25 @@ const JobByAdminTable = () => {
                           </Button>
                         </PopoverTrigger>
                         <PopoverContent
-                          className="w-44 p-1.5 rounded-xl shadow-lg border border-purple-100/80 bg-white"
+                          className="w-40 p-1.5 rounded-xl shadow-lg border border-purple-100/80 bg-white space-y-1"
                           align="end"
                         >
+                          <button
+                            onClick={() =>
+                              navigate(`/admin/jobs/${job._id}`)
+                            }
+                            className="flex items-center gap-2.5 w-full px-3 py-2 text-xs font-semibold text-gray-700 hover:bg-purple-50 hover:text-[#6A38C2] rounded-lg transition-colors cursor-pointer text-left"
+                          >
+                            <Edit2 className="w-3.5 h-3.5 text-[#6A38C2]" />
+                            <span>Edit Job</span>
+                          </button>
                           <button
                             onClick={() =>
                               navigate(`/admin/jobs/${job._id}/applicants`)
                             }
                             className="flex items-center gap-2.5 w-full px-3 py-2 text-xs font-semibold text-gray-700 hover:bg-purple-50 hover:text-[#6A38C2] rounded-lg transition-colors cursor-pointer text-left"
                           >
-                            <Eye className="w-3.5 h-3.5 text-[#6A38C2]" />
+                            <Eye className="w-3.5 h-3.5 text-purple-600" />
                             <span>View Applicants</span>
                           </button>
                         </PopoverContent>
