@@ -8,8 +8,8 @@ import { Briefcase, RotateCcw } from "lucide-react";
 import { Button } from "./ui/button";
 import Footer from "./Footer";
 
-// Helper to normalize and check salary against selected range
-const matchesSalaryRange = (jobSalary, range) => {
+// Helper to normalize and check salary against a single range string
+const matchesSingleSalaryRange = (jobSalary, range) => {
   if (!range) return true;
   if (jobSalary === undefined || jobSalary === null) return false;
 
@@ -18,7 +18,6 @@ const matchesSalaryRange = (jobSalary, range) => {
       ? jobSalary
       : parseFloat(String(jobSalary).replace(/[^0-9.]/g, "")) || 0;
 
-  // Convert raw values to LPA (e.g. 500000 -> 5 LPA, 40000 -> 0.4 LPA, 12 -> 12 LPA)
   const lpa = rawNum > 1000 ? rawNum / 100000 : rawNum;
   const monthlyK = lpa * (100 / 12);
 
@@ -59,14 +58,67 @@ const matchesSalaryRange = (jobSalary, range) => {
   return true;
 };
 
+// Helper to check dynamic job posted date against a single range string
+const matchesSinglePostedWithin = (createdAt, range) => {
+  if (!range) return true;
+  if (!createdAt) return false;
+
+  const jobDate = new Date(createdAt);
+  if (isNaN(jobDate.getTime())) return false;
+
+  const now = new Date();
+  const diffInHours = (now.getTime() - jobDate.getTime()) / (1000 * 60 * 60);
+
+  const clean = range.toLowerCase().trim();
+
+  if (clean.includes("24 hour") || clean.includes("1 day")) {
+    return diffInHours <= 24;
+  }
+  if (clean.includes("3 day")) {
+    return diffInHours <= 72; // 3 days = 72 hours
+  }
+  if (clean.includes("7 day")) {
+    return diffInHours <= 168; // 7 days = 168 hours
+  }
+
+  return true;
+};
+
+// Helper to check required experience against a single range string
+const matchesSingleExperience = (jobExp, range) => {
+  if (!range) return true;
+  if (jobExp === undefined || jobExp === null) return false;
+
+  const expNum =
+    typeof jobExp === "number"
+      ? jobExp
+      : parseFloat(String(jobExp).replace(/[^0-9.]/g, "")) || 0;
+
+  const clean = range.replace(/\s+/g, "").toLowerCase();
+
+  if (clean.includes("1–3") || clean.includes("1-3")) {
+    return expNum >= 1 && expNum <= 3;
+  }
+  if (clean.includes("4–7") || clean.includes("4-7")) {
+    return expNum >= 4 && expNum <= 7;
+  }
+  if (clean.includes("8–11") || clean.includes("8-11")) {
+    return expNum >= 8 && expNum <= 11;
+  }
+
+  return true;
+};
+
 const Jobs = () => {
   useGetAllJobs();
   const { allJobs = [] } = useSelector((store) => store.jobs);
 
   const [selectedFilters, setSelectedFilters] = useState({
-    location: "",
-    industry: "",
-    salary: "",
+    location: [],
+    industry: [],
+    salary: [],
+    postedWithin: [],
+    experience: [],
   });
 
   const handleFilterChange = (key, value) => {
@@ -78,70 +130,98 @@ const Jobs = () => {
 
   const handleResetFilters = () => {
     setSelectedFilters({
-      location: "",
-      industry: "",
-      salary: "",
+      location: [],
+      industry: [],
+      salary: [],
+      postedWithin: [],
+      experience: [],
     });
   };
 
-  // Filter jobs based on combined active filters
+  // Filter jobs based on combined multi-select active filters
   const filteredJobs = useMemo(() => {
     if (!allJobs || allJobs.length === 0) return [];
 
     return allJobs.filter((job) => {
-      // 1. Location match
-      if (selectedFilters.location) {
+      // 1. Location match (OR within location selections)
+      if (selectedFilters.location && selectedFilters.location.length > 0) {
         const jobLoc = (job?.location || "").toLowerCase().trim();
-        const targetLoc = selectedFilters.location.toLowerCase().trim();
+        const matchesAnyLocation = selectedFilters.location.some((targetLoc) => {
+          const cleanLoc = targetLoc.toLowerCase().trim();
+          const isDelhiMatch =
+            cleanLoc.includes("delhi") &&
+            (jobLoc.includes("delhi") ||
+              jobLoc.includes("noida") ||
+              jobLoc.includes("gurgaon") ||
+              jobLoc.includes("gurugram") ||
+              jobLoc.includes("ncr"));
 
-        const isDelhiMatch =
-          targetLoc.includes("delhi") &&
-          (jobLoc.includes("delhi") ||
-            jobLoc.includes("noida") ||
-            jobLoc.includes("gurgaon") ||
-            jobLoc.includes("gurugram") ||
-            jobLoc.includes("ncr"));
+          return jobLoc.includes(cleanLoc) || cleanLoc.includes(jobLoc) || isDelhiMatch;
+        });
 
-        if (!jobLoc.includes(targetLoc) && !targetLoc.includes(jobLoc) && !isDelhiMatch) {
-          return false;
-        }
+        if (!matchesAnyLocation) return false;
       }
 
-      // 2. Industry / Title match
-      if (selectedFilters.industry) {
+      // 2. Industry match (OR within industry selections)
+      if (selectedFilters.industry && selectedFilters.industry.length > 0) {
         const title = (job?.title || "").toLowerCase();
         const desc = (job?.description || "").toLowerCase();
-        const targetIndustry = selectedFilters.industry.toLowerCase();
 
-        // Check if title or description contains the industry words (e.g. frontend, backend, fullstack)
-        const industryKeywords = targetIndustry
-          .replace("developer", "")
-          .replace("engineer", "")
-          .trim()
-          .split(/\s+/);
-        const matchesIndustry =
-          title.includes(targetIndustry) ||
-          industryKeywords.every((kw) => title.includes(kw) || desc.includes(kw));
+        const matchesAnyIndustry = selectedFilters.industry.some((targetIndustry) => {
+          const cleanIndustry = targetIndustry.toLowerCase();
+          const industryKeywords = cleanIndustry
+            .replace("developer", "")
+            .replace("engineer", "")
+            .trim()
+            .split(/\s+/);
 
-        if (!matchesIndustry) {
-          return false;
-        }
+          return (
+            title.includes(cleanIndustry) ||
+            industryKeywords.every((kw) => title.includes(kw) || desc.includes(kw))
+          );
+        });
+
+        if (!matchesAnyIndustry) return false;
       }
 
-      // 3. Salary match
-      if (selectedFilters.salary) {
-        if (!matchesSalaryRange(job?.salary, selectedFilters.salary)) {
-          return false;
-        }
+      // 3. Salary match (OR within salary selections)
+      if (selectedFilters.salary && selectedFilters.salary.length > 0) {
+        const matchesAnySalary = selectedFilters.salary.some((range) =>
+          matchesSingleSalaryRange(job?.salary, range)
+        );
+
+        if (!matchesAnySalary) return false;
+      }
+
+      // 4. Posted date match (OR within date selections)
+      if (selectedFilters.postedWithin && selectedFilters.postedWithin.length > 0) {
+        const matchesAnyDate = selectedFilters.postedWithin.some((range) =>
+          matchesSinglePostedWithin(job?.createdAt, range)
+        );
+
+        if (!matchesAnyDate) return false;
+      }
+
+      // 5. Experience match (OR within experience selections)
+      if (selectedFilters.experience && selectedFilters.experience.length > 0) {
+        const exp =
+          job?.experienceLevel !== undefined ? job.experienceLevel : job?.experience;
+        const matchesAnyExp = selectedFilters.experience.some((range) =>
+          matchesSingleExperience(exp, range)
+        );
+
+        if (!matchesAnyExp) return false;
       }
 
       return true;
     });
   }, [allJobs, selectedFilters]);
 
-  const hasActiveFilters = Boolean(
-    selectedFilters.location || selectedFilters.industry || selectedFilters.salary
-  );
+  // Total active filter count
+  const totalActiveFilters = Object.values(selectedFilters).reduce((acc, curr) => {
+    if (Array.isArray(curr)) return acc + curr.length;
+    return acc + (curr ? 1 : 0);
+  }, 0);
 
   return (
     <div className="min-h-screen bg-gray-50/50 flex flex-col justify-between">
@@ -165,13 +245,13 @@ const Jobs = () => {
                 <span className="text-sm font-bold text-gray-900">
                   Showing {filteredJobs.length} {filteredJobs.length === 1 ? "Job" : "Jobs"}
                 </span>
-                {hasActiveFilters && (
+                {totalActiveFilters > 0 && (
                   <span className="text-xs text-[#6A38C2] bg-purple-50 px-2.5 py-0.5 rounded-full font-semibold border border-purple-100">
-                    Filtered
+                    {totalActiveFilters} filter{totalActiveFilters > 1 ? "s" : ""} applied
                   </span>
                 )}
               </div>
-              {hasActiveFilters && (
+              {totalActiveFilters > 0 && (
                 <Button
                   variant="ghost"
                   size="sm"
@@ -192,11 +272,11 @@ const Jobs = () => {
                 </div>
                 <h3 className="font-bold text-gray-900 text-lg">No jobs found</h3>
                 <p className="text-gray-500 text-sm mt-1 max-w-sm">
-                  {hasActiveFilters
+                  {totalActiveFilters > 0
                     ? "No jobs match your selected filter criteria. Try adjusting or resetting the filters."
                     : "No jobs are currently available. Check back soon for new opportunities."}
                 </p>
-                {hasActiveFilters && (
+                {totalActiveFilters > 0 && (
                   <Button
                     onClick={handleResetFilters}
                     className="mt-4 bg-[#6A38C2] hover:bg-[#5b30a6] text-white rounded-xl text-xs font-semibold px-5 shadow-xs cursor-pointer"
