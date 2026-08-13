@@ -73,7 +73,7 @@ const FilterCard = ({ selectedFilters = {}, onFilterChange, onReset }) => {
   };
 
   return (
-    <div className="w-full bg-white p-4 sm:p-5 rounded-2xl border border-gray-100 shadow-xs sticky top-24 space-y-3.5">
+    <div className="w-full bg-white p-4 sm:p-5 rounded-2xl border border-gray-100 shadow-xs space-y-3.5">
       {/* Header */}
       <div className="flex items-center justify-between pb-3 border-b border-gray-100">
         <div className="flex items-center gap-2">

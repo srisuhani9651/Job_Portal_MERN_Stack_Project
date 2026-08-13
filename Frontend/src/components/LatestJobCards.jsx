@@ -1,7 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Badge } from "./ui/badge";
-import { MapPin, Briefcase, IndianRupee, ArrowUpRight, Building2 } from "lucide-react";
+import { MapPin, Briefcase, IndianRupee, ArrowUpRight, Building2, Clock } from "lucide-react";
 
 const LatestJobCards = ({ job }) => {
   const navigate = useNavigate();
@@ -16,6 +16,12 @@ const LatestJobCards = ({ job }) => {
   const jobType = job?.jobType || "Full Time";
   const salary = job?.salary ? `${job.salary} LPA` : "24 LPA";
   const logoUrl = job?.company?.logo || job?.logoUrl;
+  const experienceLevel =
+    job?.experienceLevel !== undefined && job?.experienceLevel !== null
+      ? `${job.experienceLevel} ${Number(job.experienceLevel) === 1 ? "Year" : "Years"} Exp`
+      : job?.experience
+      ? `${job.experience} Exp`
+      : null;
 
   const handleCardClick = () => {
     if (job?._id) {
@@ -34,7 +40,11 @@ const LatestJobCards = ({ job }) => {
           <div className="flex items-center gap-3">
             <div className="w-11 h-11 rounded-xl bg-white border border-purple-100 flex items-center justify-center text-purple-600 font-bold text-lg shadow-xs group-hover:scale-105 transition-transform duration-300 overflow-hidden shrink-0 p-1">
               {logoUrl ? (
-                <img src={logoUrl} alt={companyName} className="max-h-full max-w-full w-auto h-auto object-contain object-center" />
+                <img
+                  src={logoUrl}
+                  alt={companyName}
+                  className="max-h-full max-w-full w-auto h-auto object-contain object-center"
+                />
               ) : (
                 <Building2 className="w-5 h-5 text-[#6A38C2]" />
               )}
@@ -80,6 +90,14 @@ const LatestJobCards = ({ job }) => {
         >
           {jobType}
         </Badge>
+        {experienceLevel && (
+          <Badge
+            className="bg-emerald-50 text-emerald-700 border-emerald-200/70 font-semibold text-xs px-2.5 py-1 rounded-full flex items-center gap-1 shadow-2xs hover:bg-emerald-100 transition-colors"
+            variant="outline"
+          >
+            {experienceLevel}
+          </Badge>
+        )}
         <Badge
           className="bg-purple-50 text-[#7209b7] border-purple-200/70 font-semibold text-xs px-2.5 py-1 rounded-full flex items-center gap-1 shadow-2xs hover:bg-purple-100 transition-colors"
           variant="outline"

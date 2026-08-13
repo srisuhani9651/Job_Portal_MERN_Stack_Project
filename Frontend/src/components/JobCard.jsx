@@ -50,6 +50,12 @@ const JobCard = ({ job }) => {
   const position = job?.position ? `${job.position} Positions` : "Open Position";
   const jobType = job?.jobType || "Full Time";
   const salary = job?.salary ? `${job.salary} LPA` : "Not disclosed";
+  const experienceLevel =
+    job?.experienceLevel !== undefined && job?.experienceLevel !== null
+      ? `${job.experienceLevel} ${Number(job.experienceLevel) === 1 ? "Year" : "Years"} Exp`
+      : job?.experience
+      ? `${job.experience} Exp`
+      : null;
 
   return (
     <div className="p-5 rounded-2xl shadow-sm hover:shadow-md bg-white border border-gray-100 transition-all duration-200 flex flex-col justify-between h-full group">
@@ -77,7 +83,11 @@ const JobCard = ({ job }) => {
         <div className="flex items-center gap-3 my-2">
           <div className="h-10 w-10 rounded-xl bg-white border border-purple-100 flex items-center justify-center text-purple-600 font-bold overflow-hidden shrink-0 p-1">
             {logo ? (
-              <img src={logo} alt={companyName} className="max-h-full max-w-full w-auto h-auto object-contain object-center" />
+              <img
+                src={logo}
+                alt={companyName}
+                className="max-h-full max-w-full w-auto h-auto object-contain object-center"
+              />
             ) : (
               <Building2 className="w-5 h-5 text-[#6A38C2]" />
             )}
@@ -106,13 +116,18 @@ const JobCard = ({ job }) => {
 
       {/* Badges and actions */}
       <div className="mt-4 pt-3 border-t border-gray-50">
-        <div className="flex flex-wrap items-center gap-2 mb-4">
+        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-4">
           <Badge className="text-blue-700 bg-blue-50 border-blue-100 hover:bg-blue-100 text-[11px] font-semibold rounded-full px-2.5 py-0.5">
             {position}
           </Badge>
           <Badge className="text-amber-700 bg-amber-50 border-amber-100 hover:bg-amber-100 text-[11px] font-semibold rounded-full px-2.5 py-0.5">
             {jobType}
           </Badge>
+          {experienceLevel && (
+            <Badge className="text-emerald-700 bg-emerald-50 border-emerald-100 hover:bg-emerald-100 text-[11px] font-semibold rounded-full px-2.5 py-0.5">
+              {experienceLevel}
+            </Badge>
+          )}
           <Badge className="text-[#6A38C2] bg-purple-50 border-purple-100 hover:bg-purple-100 text-[11px] font-semibold rounded-full px-2.5 py-0.5">
             {salary}
           </Badge>
