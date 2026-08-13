@@ -118,16 +118,19 @@ const CompaniesTable = () => {
                 >
                   {/* Logo Column */}
                   <TableCell className="pl-6 py-4">
-                    <Avatar className="h-11 w-11 rounded-xl border border-gray-200 bg-white shadow-xs">
-                      <AvatarImage
-                        src={company?.logo}
-                        alt={company?.name || "Company"}
-                        className="object-cover"
-                      />
-                      <AvatarFallback className="bg-gradient-to-br from-purple-100 to-indigo-100 text-[#6A38C2] font-bold text-sm rounded-xl">
-                        {getInitials(company?.name)}
-                      </AvatarFallback>
-                    </Avatar>
+                    <div className="h-11 w-11 rounded-xl border border-gray-200 bg-white shadow-xs flex items-center justify-center p-1 overflow-hidden shrink-0">
+                      {company?.logo ? (
+                        <img
+                          src={company.logo}
+                          alt={company.name || "Company"}
+                          className="max-h-full max-w-full w-auto h-auto object-contain object-center"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-gradient-to-br from-purple-100 to-indigo-100 text-[#6A38C2] font-bold text-xs rounded-lg flex items-center justify-center">
+                          {getInitials(company?.name)}
+                        </div>
+                      )}
+                    </div>
                   </TableCell>
 
                   {/* Company Name & Location / Website Info */}

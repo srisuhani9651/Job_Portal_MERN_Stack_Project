@@ -75,9 +75,9 @@ const JobCard = ({ job }) => {
 
         {/* Company info */}
         <div className="flex items-center gap-3 my-2">
-          <div className="h-10 w-10 rounded-xl bg-purple-50 border border-purple-100 flex items-center justify-center text-purple-600 font-bold overflow-hidden shrink-0">
+          <div className="h-10 w-10 rounded-xl bg-white border border-purple-100 flex items-center justify-center text-purple-600 font-bold overflow-hidden shrink-0 p-1">
             {logo ? (
-              <img src={logo} alt={companyName} className="h-full w-full object-cover" />
+              <img src={logo} alt={companyName} className="max-h-full max-w-full w-auto h-auto object-contain object-center" />
             ) : (
               <Building2 className="w-5 h-5 text-[#6A38C2]" />
             )}

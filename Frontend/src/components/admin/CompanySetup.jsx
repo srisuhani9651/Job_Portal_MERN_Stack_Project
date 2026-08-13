@@ -151,12 +151,19 @@ const CompanySetup = () => {
 
               {/* Company Logo Preview Avatar */}
               <div className="flex items-center gap-3 bg-gray-50 p-3 rounded-2xl border border-gray-100 self-start sm:self-auto">
-                <Avatar className="h-14 w-14 rounded-2xl border-2 border-white shadow-sm bg-white">
-                  <AvatarImage src={preview} alt={input.name} className="object-cover" />
-                  <AvatarFallback className="bg-gradient-to-br from-purple-100 to-indigo-100 text-[#6A38C2] font-bold text-lg rounded-2xl">
-                    {getInitials(input.name)}
-                  </AvatarFallback>
-                </Avatar>
+                <div className="h-14 w-14 rounded-2xl border-2 border-white shadow-sm bg-white flex items-center justify-center p-1.5 overflow-hidden shrink-0">
+                  {preview ? (
+                    <img
+                      src={preview}
+                      alt={input.name || "Company Logo"}
+                      className="max-h-full max-w-full w-auto h-auto object-contain object-center"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-purple-100 to-indigo-100 text-[#6A38C2] font-bold text-lg rounded-xl flex items-center justify-center">
+                      {getInitials(input.name)}
+                    </div>
+                  )}
+                </div>
                 <div className="pr-2">
                   <p className="text-xs font-bold text-gray-800 truncate max-w-[120px]">
                     {input.name || "Company"}

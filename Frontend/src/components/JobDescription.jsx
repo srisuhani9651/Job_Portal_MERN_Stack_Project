@@ -126,12 +126,12 @@ const JobDescription = () => {
             <div className="bg-white border border-gray-100 rounded-3xl p-6 sm:p-8 shadow-sm">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
                 <div className="flex items-start gap-4">
-                  <div className="h-16 w-16 rounded-2xl bg-purple-50 border border-purple-100 flex items-center justify-center text-purple-600 font-bold overflow-hidden shrink-0 shadow-xs">
+                  <div className="h-16 w-16 rounded-2xl bg-white border border-purple-100 flex items-center justify-center text-purple-600 font-bold overflow-hidden shrink-0 shadow-xs p-1.5">
                     {logo ? (
                       <img
                         src={logo}
                         alt={companyName}
-                        className="h-full w-full object-cover"
+                        className="max-h-full max-w-full w-auto h-auto object-contain object-center"
                       />
                     ) : (
                       <Building2 className="w-8 h-8 text-[#6A38C2]" />

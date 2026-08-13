@@ -32,9 +32,9 @@ const LatestJobCards = ({ job }) => {
       <div>
         <div className="flex items-center justify-between gap-3 mb-3">
           <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-xl bg-purple-50 border border-purple-100 flex items-center justify-center text-purple-600 font-bold text-lg shadow-xs group-hover:scale-105 transition-transform duration-300 overflow-hidden shrink-0">
+            <div className="w-11 h-11 rounded-xl bg-white border border-purple-100 flex items-center justify-center text-purple-600 font-bold text-lg shadow-xs group-hover:scale-105 transition-transform duration-300 overflow-hidden shrink-0 p-1">
               {logoUrl ? (
-                <img src={logoUrl} alt={companyName} className="w-full h-full object-cover" />
+                <img src={logoUrl} alt={companyName} className="max-h-full max-w-full w-auto h-auto object-contain object-center" />
               ) : (
                 <Building2 className="w-5 h-5 text-[#6A38C2]" />
               )}
