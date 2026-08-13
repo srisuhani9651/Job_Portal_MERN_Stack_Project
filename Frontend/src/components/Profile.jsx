@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { Contact, Mail, Pen, FileText, Sparkles, BadgeCheck } from "lucide-react";
-import AppliedJobTable from "./AppliedJobTable";
 import Navbar from "./shared/Navbar";
 import Footer from "./Footer";
 import UpdateProfileDialog from "./UpdateProfileDialog";
@@ -188,22 +187,6 @@ const Profile = () => {
               )}
             </div>
           </div>
-        </div>
-
-        {/* Applied Jobs Section */}
-        <div className="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-gray-100">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h2 className="font-bold text-xl text-gray-900 tracking-tight">
-                Applied Jobs
-              </h2>
-              <p className="text-xs text-gray-500 mt-0.5">
-                Track status updates on all positions you have submitted applications for.
-              </p>
-            </div>
-          </div>
-          {/* Applied Jobs Table */}
-          <AppliedJobTable />
         </div>
       </main>
 

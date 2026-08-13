@@ -2,15 +2,20 @@ import React, { useState } from "react";
 import { Button } from "./ui/button";
 import { Search, Sparkles, Briefcase, Building2, Users, X, TrendingUp } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { setSearchJobByText, setSearchedQuery } from "@/Redux/jobSlice";
 
 const HeroSection = () => {
   const [query, setQuery] = useState("");
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const handleSearch = (searchTerm) => {
     const term = searchTerm !== undefined ? searchTerm : query;
-    if (term.trim()) {
-      navigate(`/browse?query=${encodeURIComponent(term.trim())}`);
+    const trimmed = term ? term.trim() : "";
+    dispatch(setSearchJobByText(trimmed));
+    if (trimmed) {
+      navigate(`/browse?query=${encodeURIComponent(trimmed)}`);
     } else {
       navigate("/browse");
     }

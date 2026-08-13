@@ -16,6 +16,7 @@ import {
   Shield,
   GraduationCap,
   Building2,
+  CheckCircle2,
 } from "lucide-react";
 import { USER_API } from "@/utils/constant";
 import { setUser } from "@/Redux/authSlice";
@@ -187,18 +188,33 @@ const Navbar = () => {
                   {/* Menu Options */}
                   <div className="p-2 space-y-1">
                     {!isRecruiter && (
-                      <Link
-                        to="/profile"
-                        className="flex items-center justify-between px-3 py-2.5 text-sm font-medium text-gray-700 hover:bg-purple-50/80 hover:text-[#6A38C2] rounded-xl transition-colors cursor-pointer group"
-                      >
-                        <div className="flex items-center gap-2.5">
-                          <div className="p-1.5 rounded-lg bg-purple-100/60 text-[#6A38C2]">
-                            <User2 className="w-4 h-4" />
+                      <>
+                        <Link
+                          to="/profile"
+                          className="flex items-center justify-between px-3 py-2.5 text-sm font-medium text-gray-700 hover:bg-purple-50/80 hover:text-[#6A38C2] rounded-xl transition-colors cursor-pointer group"
+                        >
+                          <div className="flex items-center gap-2.5">
+                            <div className="p-1.5 rounded-lg bg-purple-100/60 text-[#6A38C2]">
+                              <User2 className="w-4 h-4" />
+                            </div>
+                            <span>View Profile</span>
                           </div>
-                          <span>View Profile</span>
-                        </div>
-                        <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-[#6A38C2] transition-colors" />
-                      </Link>
+                          <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-[#6A38C2] transition-colors" />
+                        </Link>
+
+                        <Link
+                          to="/applied-jobs"
+                          className="flex items-center justify-between px-3 py-2.5 text-sm font-medium text-gray-700 hover:bg-purple-50/80 hover:text-[#6A38C2] rounded-xl transition-colors cursor-pointer group"
+                        >
+                          <div className="flex items-center gap-2.5">
+                            <div className="p-1.5 rounded-lg bg-purple-100/60 text-[#6A38C2]">
+                              <CheckCircle2 className="w-4 h-4" />
+                            </div>
+                            <span>Applied Jobs</span>
+                          </div>
+                          <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-[#6A38C2] transition-colors" />
+                        </Link>
+                      </>
                     )}
 
                     <button
@@ -324,14 +340,24 @@ const Navbar = () => {
 
                 <div className="flex flex-col gap-1">
                   {!isRecruiter && (
-                    <Link
-                      to="/profile"
-                      onClick={() => setMenuOpen(false)}
-                      className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-gray-700 hover:bg-purple-50 hover:text-[#6A38C2] rounded-xl transition-colors"
-                    >
-                      <User2 className="w-4 h-4 text-[#6A38C2]" />
-                      <span>View Profile</span>
-                    </Link>
+                    <>
+                      <Link
+                        to="/profile"
+                        onClick={() => setMenuOpen(false)}
+                        className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-gray-700 hover:bg-purple-50 hover:text-[#6A38C2] rounded-xl transition-colors"
+                      >
+                        <User2 className="w-4 h-4 text-[#6A38C2]" />
+                        <span>View Profile</span>
+                      </Link>
+                      <Link
+                        to="/applied-jobs"
+                        onClick={() => setMenuOpen(false)}
+                        className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-gray-700 hover:bg-purple-50 hover:text-[#6A38C2] rounded-xl transition-colors"
+                      >
+                        <CheckCircle2 className="w-4 h-4 text-[#6A38C2]" />
+                        <span>Applied Jobs</span>
+                      </Link>
+                    </>
                   )}
                   <button
                     onClick={() => {
