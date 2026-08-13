@@ -127,6 +127,13 @@ const Login = () => {
                 <Label htmlFor="password" className="text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
                   Password
                 </Label>
+                {/* Link to OTP-based forgot password page */}
+                <Link
+                  to="/forgot-password"
+                  className="text-xs font-medium text-indigo-600 dark:text-indigo-400 hover:underline"
+                >
+                  Forgot Password?
+                </Link>
               </div>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">

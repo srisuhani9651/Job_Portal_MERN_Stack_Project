@@ -1,7 +1,16 @@
+import crypto from "crypto";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { User } from "../models/user.model.js";
 import cloudinary from "../utils/cloudinary.js";
+import { sendOtpEmail } from "../utils/email.js";
+import {
+  generateTOTP,
+  verifyTOTP,
+  checkRateLimit,
+  recordFailedAttempt,
+  resetRateLimit,
+} from "../utils/totp.js";
 
 export const register = async (req, res) => {
   try {
@@ -233,3 +242,154 @@ export const changePassword = async (req, res) => {
       .json({ message: "Something went wrong", success: false });
   }
 };
+
+// Generates stateless 30-second HMAC-based TOTP and emails it to the user
+export const sendResetPasswordOtp = async (req, res) => {
+  try {
+    const { email } = req.body;
+    console.log(`[Forgot Password] Received OTP request for email: "${email}"`);
+
+    if (!email) {
+      return res
+        .status(400)
+        .json({ message: "Email is required", success: false });
+    }
+
+    const normalizedEmail = email.toLowerCase().trim();
+    // Case-insensitive lookup ensures user is matched regardless of storage casing
+    const user = await User.findOne({
+      email: { $regex: new RegExp(`^${normalizedEmail}$`, "i") },
+    });
+
+    // Returns a generic success response to prevent user enumeration
+    if (!user) {
+      console.log(`[Forgot Password] No account found for email: "${normalizedEmail}". Generic success response sent.`);
+      return res.status(200).json({
+        message: "If an account with that email exists, an OTP has been sent.",
+        success: true,
+      });
+    }
+
+    // Derives stateless 30-second OTP using HMAC without DB storage
+    const targetEmail = user.email.toLowerCase().trim();
+    const otp = generateTOTP(targetEmail);
+    console.log(`[Forgot Password] OTP successfully generated for recipient: "${targetEmail}"`);
+
+    // Sends OTP to registered email via Gmail SMTP
+    const emailResult = await sendOtpEmail(targetEmail, otp);
+    console.log(`[Forgot Password] Email dispatch completed with status:`, emailResult.success ? "SUCCESS" : "FAILED/FALLBACK");
+
+    return res.status(200).json({
+      message: "If an account with that email exists, an OTP has been sent.",
+      success: true,
+    });
+  } catch (error) {
+    console.error("sendResetPasswordOtp error:", error);
+    return res
+      .status(500)
+      .json({ message: "Failed to send OTP. Please try again.", success: false });
+  }
+};
+
+// Verifies stateless TOTP with rate limiting against brute force attempts
+export const verifyResetPasswordOtp = async (req, res) => {
+  try {
+    const { email, otp } = req.body;
+    if (!email || !otp) {
+      return res
+        .status(400)
+        .json({ message: "Email and OTP are required", success: false });
+    }
+
+    const normalizedEmail = email.toLowerCase().trim();
+
+    // Enforces rate-limiting attempt protection
+    const rateCheck = checkRateLimit(normalizedEmail);
+    if (!rateCheck.allowed) {
+      return res.status(429).json({ message: rateCheck.message, success: false });
+    }
+
+    // Compares submitted OTP with derived HMAC-TOTP
+    const isValid = verifyTOTP(normalizedEmail, otp);
+    if (!isValid) {
+      recordFailedAttempt(normalizedEmail);
+      return res
+        .status(400)
+        .json({ message: "Invalid or expired OTP (valid for 30 seconds)", success: false });
+    }
+
+    return res.status(200).json({
+      message: "OTP verified successfully",
+      success: true,
+    });
+  } catch (error) {
+    console.error("verifyResetPasswordOtp error:", error);
+    return res
+      .status(500)
+      .json({ message: "Internal server error", success: false });
+  }
+};
+
+// Verifies TOTP, validates password strength, and updates user password in MongoDB
+export const resetPasswordWithOtp = async (req, res) => {
+  try {
+    const { email, otp, newPassword } = req.body;
+    if (!email || !otp || !newPassword) {
+      return res
+        .status(400)
+        .json({ message: "All fields are required", success: false });
+    }
+
+    const normalizedEmail = email.toLowerCase().trim();
+
+    // Enforces rate-limiting attempt protection
+    const rateCheck = checkRateLimit(normalizedEmail);
+    if (!rateCheck.allowed) {
+      return res.status(429).json({ message: rateCheck.message, success: false });
+    }
+
+    // Validates password criteria (min 8 chars, uppercase, lowercase, number, special char)
+    const isStrongPassword =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/.test(newPassword);
+    if (!isStrongPassword) {
+      return res.status(400).json({
+        message:
+          "Password must contain at least 8 characters, 1 uppercase letter, 1 lowercase letter, 1 number, and 1 special character.",
+        success: false,
+      });
+    }
+
+    // Re-derives and validates TOTP mathematically
+    const isValid = verifyTOTP(normalizedEmail, otp);
+    if (!isValid) {
+      recordFailedAttempt(normalizedEmail);
+      return res
+        .status(400)
+        .json({ message: "Invalid or expired OTP (valid for 30 seconds)", success: false });
+    }
+
+    const user = await User.findOne({ email: normalizedEmail });
+    if (!user) {
+      return res.status(400).json({ message: "User not found", success: false });
+    }
+
+    // Hashes new password and updates user document
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    user.password = hashedPassword;
+    await user.save();
+
+    // Clears rate limit attempt counter upon successful password reset
+    resetRateLimit(normalizedEmail);
+
+    return res.status(200).json({
+      message: "Password reset successfully. You can now log in.",
+      success: true,
+    });
+  } catch (error) {
+    console.error("resetPasswordWithOtp error:", error);
+    return res
+      .status(500)
+      .json({ message: "Failed to reset password. Please try again.", success: false });
+  }
+};
+
