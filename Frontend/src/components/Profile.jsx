@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { Contact, Mail, Pen, FileText, Sparkles, BadgeCheck } from "lucide-react";
+import { Contact, Mail, Pen, FileText, Sparkles, BadgeCheck, ExternalLink } from "lucide-react";
 import Navbar from "./shared/Navbar";
 import Footer from "./Footer";
 import UpdateProfileDialog from "./UpdateProfileDialog";
@@ -165,17 +165,16 @@ const Profile = () => {
               </h2>
               {hasResume ? (
                 <a
+                  href={user?.profile?.resume}
                   target="_blank"
                   rel="noopener noreferrer"
-                  // resume url is receiving here>
-                  href={user?.profile?.resume} 
                   className="inline-flex items-center gap-2 text-sm font-semibold text-purple-600 hover:text-purple-700 bg-purple-50 hover:bg-purple-100 border border-purple-200/60 px-4 py-2 rounded-xl transition-all group"
                 >
                   <FileText className="w-4 h-4 text-purple-600 group-hover:scale-110 transition-transform" />
                   <span className="underline underline-offset-2">
-                    {/* showing original resume name */}
-                    {user?.profile?.resumeOriginalName || "View Uploaded Resume"} 
+                    {user?.profile?.resumeOriginalName || "View Uploaded Resume"}
                   </span>
+                  <ExternalLink className="w-3.5 h-3.5 text-purple-400 group-hover:text-purple-600 transition-colors" />
                 </a>
               ) : (
                 <div className="flex items-center gap-2 text-xs text-gray-500">

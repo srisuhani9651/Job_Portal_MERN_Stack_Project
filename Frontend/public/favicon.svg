@@ -1,44 +1,19 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
-  <!-- Rounded Gradient Background Squircle -->
-  <defs>
-    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#4F46E5" />
-      <stop offset="100%" stop-color="#7C3AED" />
-    </linearGradient>
-    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#F59E0B" />
-      <stop offset="100%" stop-color="#EF4444" />
-    </linearGradient>
-    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#312E81" flood-opacity="0.35" />
-    </filter>
-  </defs>
+  <!-- Slate Blue Background Matching Jobsphere Brand -->
+  <rect width="64" height="64" rx="14" fill="#3e566b" />
 
-  <!-- Background Base -->
-  <rect width="64" height="64" rx="16" fill="url(#bgGrad)" />
+  <!-- Rocket Icon -->
+  <g transform="translate(10, 10)">
+    <!-- Rocket Fuselage and Fins -->
+    <path d="M37 1C37 1 27 2 18.5 10.5C14.5 14.5 13 19 13 23C9 24 5 27.5 5 27.5C5 27.5 10.5 29 14.2 27.8C14.8 29.8 15.8 31.8 17.2 33.2C16 37 17.5 42.5 17.5 42.5C17.5 42.5 21 38.5 22 34.5C26 34.5 30.5 33 34.5 29C43 20.5 44 10.5 44 10.5C44 10.5 39.5 5 37 1Z" 
+          fill="#FFFFFF" />
 
-  <!-- Briefcase Handle -->
-  <path d="M24 20V17C24 14.7909 25.7909 13 28 13H36C38.2091 13 40 14.7909 40 17V20" 
-        stroke="#FFFFFF" 
-        stroke-width="3.5" 
-        stroke-linecap="round" 
-        stroke-linejoin="round" />
+    <!-- Rocket Window -->
+    <circle cx="29.5" cy="15.5" r="3.2" fill="#3e566b" />
 
-  <!-- Briefcase Main Body -->
-  <rect x="12" y="20" width="40" height="28" rx="6" fill="#FFFFFF" filter="url(#glow)" />
-
-  <!-- Briefcase Inner Accent Cut / Flap Line -->
-  <path d="M12 28L28.8 35.2C30.8 36 33.2 36 35.2 35.2L52 28" 
-        stroke="#E0E7FF" 
-        stroke-width="2.5" 
-        stroke-linecap="round" 
-        stroke-linejoin="round" />
-
-  <!-- Center Lock / Badge Accent -->
-  <rect x="29" y="32" width="6" height="7" rx="2" fill="url(#bgGrad)" />
-  <circle cx="32" cy="35" r="1" fill="#FFFFFF" />
-
-  <!-- Small Vibrant Sparkle / Opportunity Dot -->
-  <circle cx="48" cy="16" r="4" fill="url(#accentGrad)" />
-  <path d="M48 13.5V18.5M45.5 16H50.5" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round" />
+    <!-- Exhaust Jet Flames -->
+    <path d="M11 33C7 38 4 43 4 43C4 43 9 40 14 36L11 33Z" fill="#FFFFFF" opacity="0.95" />
+    <path d="M7 29C4 33 2 37 2 37C2 37 6 35 9 32L7 29Z" fill="#FFFFFF" opacity="0.85" />
+    <path d="M15 37C12 41 10 45 10 45C10 45 14 42 17 39L15 37Z" fill="#FFFFFF" opacity="0.85" />
+  </g>
 </svg>

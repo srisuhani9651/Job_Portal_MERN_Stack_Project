@@ -168,18 +168,40 @@ export const updateprofile = async (req, res) => {
     for (const file of files) {
       //dataUri parser
       const fileUri = `data:${file.mimetype};base64,${file.buffer.toString("base64")}`;
-      const cloudResponse = await cloudinary.uploader.upload(fileUri, {
-        resource_type: "auto",
-      });
-
       if (
         file.fieldname === "profilePhoto" ||
         (file.fieldname === "file" && file.mimetype.startsWith("image/"))
       ) {
+        const cloudResponse = await cloudinary.uploader.upload(fileUri, {
+          resource_type: "image",
+          folder: "job_portal_avatars",
+        });
         user.profile.profilePhoto = cloudResponse.secure_url;
       } else {
-        user.profile.resume = cloudResponse.secure_url; // save the cloudinary url
-        user.profile.resumeOriginalName = file.originalname; // 
+        // Uploads PDF using Cloudinary image/pdf resource type to preserve vector hyperlinks
+        const cleanName = (file.originalname || "resume.pdf")
+          .replace(/\.pdf$/i, "")
+          .replace(/[^a-zA-Z0-9_-]/g, "_");
+
+        const cloudResponse = await cloudinary.uploader.upload(fileUri, {
+          resource_type: "image",
+          format: "pdf",
+          folder: "job_portal_resumes",
+          public_id: `${Date.now()}_${cleanName}`,
+          access_mode: "public",
+          type: "upload",
+        });
+
+        console.log("[Cloudinary Resume Upload]:", {
+          resource_type: cloudResponse.resource_type,
+          format: cloudResponse.format,
+          delivery_type: cloudResponse.type,
+          secure_url: cloudResponse.secure_url,
+          bytes: cloudResponse.bytes,
+        });
+
+        user.profile.resume = cloudResponse.secure_url;
+        user.profile.resumeOriginalName = file.originalname;
       }
     }
 
