@@ -62,8 +62,25 @@ const Signup = () => {
     }
   };
 
+  const isStrongPassword = (password) => {
+    const hasMinLength = password.length >= 8;
+    const hasUpperCase = /[A-Z]/.test(password);
+    const hasLowerCase = /[a-z]/.test(password);
+    const hasNumber = /[0-9]/.test(password);
+    const hasSpecialChar = /[^A-Za-z0-9]/.test(password);
+
+    return hasMinLength && hasUpperCase && hasLowerCase && hasNumber && hasSpecialChar;
+  };
+
   const submitHandler = async (e) => {
     e.preventDefault();
+
+    if (!isStrongPassword(input.password)) {
+      toast.error(
+        "Password must contain at least 8 characters, 1 uppercase letter, 1 lowercase letter, 1 number, and 1 special character."
+      );
+      return;
+    }
 
     if (!input.role) {
       toast.error("Please select a role (Student or Recruiter)");
@@ -225,6 +242,9 @@ const Signup = () => {
                   )}
                 </button>
               </div>
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-tight">
+                Must contain at least 8 characters, 1 uppercase letter, 1 lowercase letter, 1 number, and 1 special character.
+              </p>
             </div>
 
             {/* Role Selection */}

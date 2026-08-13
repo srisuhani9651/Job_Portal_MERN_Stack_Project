@@ -9,6 +9,7 @@ import { setSearchJobByText } from "@/Redux/jobSlice";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
 import { X, Briefcase, Search } from "lucide-react";
+import { filterJobsFuzzy } from "@/utils/fuzzySearch";
 
 const Browse = () => {
   useGetAllJobs();
@@ -31,101 +32,11 @@ const Browse = () => {
     }
   }, [urlQuery, searchJobByText, dispatch]);
 
-  const activeQuery = (localSearch || urlQuery || searchJobByText || "").trim().toLowerCase();
+  const activeQuery = localSearch || urlQuery || searchJobByText || "";
 
-  // Filter jobs based on active search query
+  // Fuzzy filter jobs based on active search query
   const filterJobs = useMemo(() => {
-    if (!activeQuery) {
-      return allJobs || [];
-    }
-
-    return (allJobs || []).filter((job) => {
-      const title = (job?.title || "").toLowerCase();
-      const description = (job?.description || "").toLowerCase();
-      const location = (job?.location || "").toLowerCase();
-      const jobType = (job?.jobType || "").toLowerCase();
-      const companyName = (
-        typeof job?.company === "object"
-          ? job?.company?.name || ""
-          : typeof job?.company === "string"
-          ? job?.company
-          : ""
-      ).toLowerCase();
-      const requirements = (
-        Array.isArray(job?.requirements)
-          ? job.requirements.join(" ")
-          : typeof job?.requirements === "string"
-          ? job.requirements
-          : ""
-      ).toLowerCase();
-
-      // Smart matching for popular tags
-      if (activeQuery === "remote jobs" || activeQuery === "remote") {
-        return (
-          location.includes("remote") ||
-          jobType.includes("remote") ||
-          title.includes("remote") ||
-          description.includes("remote")
-        );
-      }
-
-      if (activeQuery === "full stack" || activeQuery === "fullstack") {
-        return (
-          title.includes("full stack") ||
-          title.includes("fullstack") ||
-          title.includes("full-stack") ||
-          description.includes("full stack") ||
-          description.includes("fullstack") ||
-          requirements.includes("full stack") ||
-          requirements.includes("fullstack")
-        );
-      }
-
-      if (activeQuery === "frontend developer" || activeQuery === "frontend") {
-        return (
-          title.includes("frontend") ||
-          title.includes("front-end") ||
-          title.includes("front end") ||
-          title.includes("react") ||
-          title.includes("web developer") ||
-          description.includes("frontend") ||
-          requirements.includes("frontend") ||
-          requirements.includes("react")
-        );
-      }
-
-      if (activeQuery === "backend developer" || activeQuery === "backend") {
-        return (
-          title.includes("backend") ||
-          title.includes("back-end") ||
-          title.includes("back end") ||
-          title.includes("node") ||
-          description.includes("backend") ||
-          requirements.includes("backend") ||
-          requirements.includes("node")
-        );
-      }
-
-      if (activeQuery === "data analyst" || activeQuery === "data") {
-        return (
-          title.includes("data") ||
-          title.includes("analyst") ||
-          title.includes("analytics") ||
-          description.includes("data") ||
-          requirements.includes("data") ||
-          requirements.includes("sql")
-        );
-      }
-
-      const fullSearchContent = `${title} ${description} ${location} ${jobType} ${companyName} ${requirements}`;
-
-      if (fullSearchContent.includes(activeQuery)) {
-        return true;
-      }
-
-      const queryTokens = activeQuery.split(/\s+/).filter(Boolean);
-      return queryTokens.every((token) => fullSearchContent.includes(token));
-    });
+    return filterJobsFuzzy(allJobs, activeQuery);
   }, [allJobs, activeQuery]);
 
   const handleSearchChange = (value) => {

@@ -94,32 +94,36 @@ const Navbar = () => {
 
           {/* Desktop Navigation Links */}
           <nav className="hidden md:flex items-center gap-6">
-            <ul className="flex items-center gap-2">
-              {navLinks.map((link) => {
-                const isActive =
-                  link.path === "/"
-                    ? location.pathname === "/"
-                    : location.pathname.startsWith(link.path);
-                const IconComponent = link.icon;
-                return (
-                  <li key={link.path}>
-                    <Link
-                      to={link.path}
-                      className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 flex items-center gap-2 ${
-                        isActive
-                          ? "bg-purple-50/90 text-[#6A38C2] font-semibold border border-purple-100 shadow-xs"
-                          : "text-gray-600 hover:text-[#6A38C2] hover:bg-purple-50/50"
-                      }`}
-                    >
-                      <IconComponent className={`w-4 h-4 ${isActive ? "text-[#6A38C2]" : "text-gray-400"}`} />
-                      <span>{link.name}</span>
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
+            {user && (
+              <>
+                <ul className="flex items-center gap-2">
+                  {navLinks.map((link) => {
+                    const isActive =
+                      link.path === "/"
+                        ? location.pathname === "/"
+                        : location.pathname.startsWith(link.path);
+                    const IconComponent = link.icon;
+                    return (
+                      <li key={link.path}>
+                        <Link
+                          to={link.path}
+                          className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 flex items-center gap-2 ${
+                            isActive
+                              ? "bg-purple-50/90 text-[#6A38C2] font-semibold border border-purple-100 shadow-xs"
+                              : "text-gray-600 hover:text-[#6A38C2] hover:bg-purple-50/50"
+                          }`}
+                        >
+                          <IconComponent className={`w-4 h-4 ${isActive ? "text-[#6A38C2]" : "text-gray-400"}`} />
+                          <span>{link.name}</span>
+                        </Link>
+                      </li>
+                    );
+                  })}
+                </ul>
 
-            <div className="h-6 w-[1px] bg-gray-200/80 mx-1" />
+                <div className="h-6 w-[1px] bg-gray-200/80 mx-1" />
+              </>
+            )}
 
             {/* User Auth Buttons or Popover */}
             {!user ? (
@@ -235,44 +239,66 @@ const Navbar = () => {
             )}
           </nav>
 
-          {/* Mobile Menu Toggle */}
+          {/* Mobile Right Bar */}
           <div className="flex items-center gap-2 md:hidden">
-            {user && (
-              !isRecruiter ? (
-                <Link to="/profile" className="mr-1">
-                  <Avatar className="h-8 w-8 border border-purple-200">
-                    <AvatarImage src={user?.profile?.profilePhoto} alt={userName} />
-                    <AvatarFallback className="bg-purple-100 text-[#6A38C2] text-xs font-bold">
-                      {getInitials(userName)}
-                    </AvatarFallback>
-                  </Avatar>
+            {!user ? (
+              <div className="flex items-center gap-2">
+                <Link to="/login">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="border-gray-200 text-gray-700 hover:text-[#6A38C2] rounded-full px-3.5 py-1 text-xs font-semibold"
+                  >
+                    Login
+                  </Button>
                 </Link>
-              ) : (
-                <div className="mr-1">
-                  <Avatar className="h-8 w-8 border border-purple-200">
-                    <AvatarImage src={user?.profile?.profilePhoto} alt={userName} />
-                    <AvatarFallback className="bg-purple-100 text-[#6A38C2] text-xs font-bold">
-                      {getInitials(userName)}
-                    </AvatarFallback>
-                  </Avatar>
-                </div>
-              )
+                <Link to="/signup">
+                  <Button
+                    size="sm"
+                    className="bg-gradient-to-r from-[#6A38C2] to-indigo-600 hover:opacity-95 text-white rounded-full px-3.5 py-1 text-xs font-semibold shadow-xs"
+                  >
+                    Sign Up
+                  </Button>
+                </Link>
+              </div>
+            ) : (
+              <>
+                {!isRecruiter ? (
+                  <Link to="/profile" className="mr-1">
+                    <Avatar className="h-8 w-8 border border-purple-200">
+                      <AvatarImage src={user?.profile?.profilePhoto} alt={userName} />
+                      <AvatarFallback className="bg-purple-100 text-[#6A38C2] text-xs font-bold">
+                        {getInitials(userName)}
+                      </AvatarFallback>
+                    </Avatar>
+                  </Link>
+                ) : (
+                  <div className="mr-1">
+                    <Avatar className="h-8 w-8 border border-purple-200">
+                      <AvatarImage src={user?.profile?.profilePhoto} alt={userName} />
+                      <AvatarFallback className="bg-purple-100 text-[#6A38C2] text-xs font-bold">
+                        {getInitials(userName)}
+                      </AvatarFallback>
+                    </Avatar>
+                  </div>
+                )}
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setMenuOpen(!menuOpen)}
+                  className="text-gray-700 hover:text-[#6A38C2] hover:bg-purple-50/80 rounded-xl"
+                  aria-label="Toggle Menu"
+                >
+                  {menuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+                </Button>
+              </>
             )}
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setMenuOpen(!menuOpen)}
-              className="text-gray-700 hover:text-[#6A38C2] hover:bg-purple-50/80 rounded-xl"
-              aria-label="Toggle Menu"
-            >
-              {menuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-            </Button>
           </div>
         </div>
       </div>
 
       {/* Mobile Drawer Navigation */}
-      {menuOpen && (
+      {menuOpen && user && (
         <div className="md:hidden bg-white/95 backdrop-blur-xl border-b border-purple-100 px-4 pt-3 pb-6 space-y-4 shadow-xl animate-in slide-in-from-top duration-200">
           <ul className="flex flex-col space-y-1.5">
             {navLinks.map((link) => {
