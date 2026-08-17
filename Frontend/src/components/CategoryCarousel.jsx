@@ -8,6 +8,8 @@ import {
 } from "./ui/carousel";
 import { Button } from "./ui/button";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { setSearchJobByText } from "@/Redux/jobSlice";
 import {
   Code2,
   Server,
@@ -92,10 +94,12 @@ const categories = [
 
 const CategoryCarousel = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const handleCategoryClick = (categoryName) => {
     // Pass core keyword
     const cleaned = categoryName.split("&")[0].trim();
+    dispatch(setSearchJobByText(cleaned));
     navigate(`/browse?query=${encodeURIComponent(cleaned)}`);
   };
 

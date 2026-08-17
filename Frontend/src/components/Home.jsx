@@ -4,8 +4,6 @@ import HeroSection from "./HeroSection";
 import CareerMetrics from "./CareerMetrics";
 import CategoryCarousel from "./CategoryCarousel";
 import LatestJobs from "./LatestJobs";
-import CareerFeatures from "./CareerFeatures";
-import HomeCTA from "./HomeCTA";
 import Footer from "./Footer";
 import useGetAllJobs from "@/hooks/useGetAllJobs";
 import { useSelector } from "react-redux";
@@ -33,8 +31,6 @@ const Home = () => {
         <CareerMetrics />
         <CategoryCarousel />
         <LatestJobs />
-        <CareerFeatures />
-        <HomeCTA />
       </div>
       <Footer />
     </div>
