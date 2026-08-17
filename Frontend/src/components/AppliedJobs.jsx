@@ -21,9 +21,12 @@ const AppliedJobs = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    if (!user) {
+      navigate("/login");
+      return;
+    }
     if (
-      user &&
-      (user?.role === "Recruiter" || user?.role?.toLowerCase() === "recruiter")
+      user?.role === "Recruiter" || user?.role?.toLowerCase() === "recruiter"
     ) {
       navigate("/admin/companies");
     }

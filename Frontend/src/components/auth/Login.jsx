@@ -18,6 +18,7 @@ import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { USER_API } from "@/utils/constant";
 import { setLoading, setUser } from "@/Redux/authSlice";
+import { loadUserSavedJobs } from "@/Redux/jobSlice";
 
 const Login = () => {
   const [input, setInput] = useState({
@@ -53,6 +54,10 @@ const Login = () => {
 
       if (res.data.success) {
         dispatch(setUser(res.data.user));
+        const userId = res.data.user?._id || res.data.user?.id;
+        if (userId) {
+          dispatch(loadUserSavedJobs(userId));
+        }
         if (res.data.user?.role === "Recruiter" || res.data.user?.role?.toLowerCase() === "recruiter") {
           navigate("/admin/companies");
         } else {

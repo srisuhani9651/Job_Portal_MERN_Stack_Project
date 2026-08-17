@@ -179,19 +179,23 @@ Backend checks if application already exists:
 Frontend triggers toast.success("Job applied successfully") and sets local isApplied = true
 
 ========================================================================================
-3. SAVE JOB FOR LATER FLOW
+3. SAVE JOB FOR LATER FLOW (User-Specific)
 ========================================================================================
 Student clicks bookmark / "Save For Later" on JobCard.jsx
   │
   ▼
-Frontend executes dispatch(toggleSaveJob(job._id))
+Check Authentication (if unauthenticated → prompt login)
   │
-  ├── Redux state: adds/removes jobId from state.jobs.savedJobs array
-  └── LocalStorage: writes updated array to localStorage.setItem("savedJobs", ...)
+  ▼
+Frontend executes dispatch(toggleSaveJob({ jobId: job._id, userId: user._id }))
+  │
+  ├── Redux state: adds/removes jobId from state.jobs.savedJobs array for current user
+  └── LocalStorage: writes updated array to user-isolated localStorage.setItem(`savedJobs_${userId}`, ...)
   │
   ▼
 - UI instantly updates bookmark icon fill color and button label to "Saved"
-- /applied-jobs "Saved for Later" section instantly updates list in real time
+- /applied-jobs "Saved for Later" section displays only current student's saved opportunities
+- Switching/logging out clears Redux state so other accounts never see cross-user bookmarks
 ```
 
 ---

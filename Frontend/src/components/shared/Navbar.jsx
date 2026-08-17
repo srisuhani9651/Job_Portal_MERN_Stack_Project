@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { USER_API } from "@/utils/constant";
 import { setUser } from "@/Redux/authSlice";
+import { clearSavedJobs } from "@/Redux/jobSlice";
 
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -44,6 +45,7 @@ const Navbar = () => {
       });
       if (res.data?.success) {
         dispatch(setUser(null));
+        dispatch(clearSavedJobs());
         navigate("/");
         toast.success(res.data.message || "Logged out successfully");
       }

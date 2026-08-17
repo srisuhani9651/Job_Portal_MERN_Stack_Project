@@ -10,6 +10,7 @@ import { toggleSaveJob } from "@/Redux/jobSlice";
 const JobCard = ({ job }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const { user } = useSelector((store) => store.auth);
   const { savedJobs = [] } = useSelector((store) => store.jobs);
   const isSaved = savedJobs.includes(job?._id);
 
@@ -26,8 +27,14 @@ const JobCard = ({ job }) => {
 
   const handleSaveToggle = (e) => {
     e.stopPropagation();
+    if (!user) {
+      toast.error("Please login to save jobs for later");
+      navigate("/login");
+      return;
+    }
     if (!job?._id) return;
-    dispatch(toggleSaveJob(job._id));
+    const userId = user?._id || user?.id;
+    dispatch(toggleSaveJob({ jobId: job._id, userId }));
     if (isSaved) {
       toast.info(`Removed "${job?.title || "Job"}" from saved jobs`);
     } else {
