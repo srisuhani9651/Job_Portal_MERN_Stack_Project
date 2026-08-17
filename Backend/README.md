@@ -165,10 +165,10 @@ Backend/
 * Persists user to MongoDB.
 
 ### 2. Authentication & Session Flow (`POST /api/v1/user/login`)
-`User Login → Validate Email/Role → Bcrypt.compare() → JWT Sign → Set-Cookie (httpOnly, maxAge: 1d, sameSite: strict) → 200 Response`
-* Locates user by `email`.
-* Checks role match (`Student` vs `Recruiter`).
+`User Login → Validate Email/Password → Bcrypt.compare() → Resolve Stored Role → JWT Sign → Set-Cookie (httpOnly, maxAge: 1d, sameSite: strict) → 200 Response`
+* Locates user by `email` (case-insensitive lookup).
 * Compares password with `bcrypt.compare(password, user.password)`.
+* Automatically retrieves user role (`Student` vs `Recruiter`) from the matched account record.
 * Issues JSON Web Token signed with `process.env.SECRET_KEY` containing `{ userId: user._id }`.
 * Attaches token into HTTP-only cookie with strict security flags.
 
@@ -201,7 +201,7 @@ Backend/
 | HTTP Method | Route | Auth Required | Description |
 | :--- | :--- | :---: | :--- |
 | `POST` | `/api/v1/user/register` | No | Register student or recruiter with optional photo |
-| `POST` | `/api/v1/user/login` | No | Authenticate user, verify role, set HTTP-only cookie |
+| `POST` | `/api/v1/user/login` | No | Authenticate user, auto-detect role, set HTTP-only cookie |
 | `GET` | `/api/v1/user/logout` | No | Invalidate auth cookie |
 | `POST` | `/api/v1/user/profile/update` | Yes | Update profile, bio, skills, and upload PDF resume |
 | `POST` | `/api/v1/user/forgot-password/send-otp` | No | Generate and email 30s HMAC-SHA256 TOTP |

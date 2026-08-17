@@ -9,10 +9,7 @@ import {
   Eye, 
   EyeOff, 
   Loader2, 
-  GraduationCap, 
-  Briefcase, 
-  LogIn, 
-  CheckCircle2 
+  LogIn 
 } from "lucide-react";
 
 import Navbar from "../shared/Navbar";
@@ -26,7 +23,6 @@ const Login = () => {
   const [input, setInput] = useState({
     email: "",
     password: "",
-    role: "",
   });
   const [showPassword, setShowPassword] = useState(false);
 
@@ -38,15 +34,11 @@ const Login = () => {
     setInput({ ...input, [e.target.name]: e.target.value });
   };
 
-  const setRoleHandler = (role) => {
-    setInput((prev) => ({ ...prev, role }));
-  };
-
   const submitHandler = async (e) => {
     e.preventDefault();
 
-    if (!input.role) {
-      toast.error("Please select your role (Student or Recruiter)");
+    if (!input.email || !input.password) {
+      toast.error("Please enter both email and password");
       return;
     }
 
@@ -159,48 +151,6 @@ const Login = () => {
                     <EyeOff className="h-4 w-4" />
                   ) : (
                     <Eye className="h-4 w-4" />
-                  )}
-                </button>
-              </div>
-            </div>
-
-            {/* Role Selection */}
-            <div className="space-y-1.5 pt-1">
-              <Label className="text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
-                Account Type
-              </Label>
-              <div className="grid grid-cols-2 gap-3">
-                {/* Student Option */}
-                <button
-                  type="button"
-                  onClick={() => setRoleHandler("Student")}
-                  className={`relative flex items-center justify-center gap-2 p-3 rounded-xl border text-sm font-medium transition-all ${
-                    input.role === "Student"
-                      ? "border-indigo-600 bg-indigo-50/80 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 ring-2 ring-indigo-600/20"
-                      : "border-slate-200 dark:border-slate-700 bg-slate-50/30 dark:bg-slate-800/30 text-slate-600 dark:text-slate-400 hover:bg-slate-100/60 dark:hover:bg-slate-800"
-                  }`}
-                >
-                  <GraduationCap className="w-4 h-4" />
-                  <span>Student</span>
-                  {input.role === "Student" && (
-                    <CheckCircle2 className="w-3.5 h-3.5 absolute top-2 right-2 text-indigo-600 dark:text-indigo-400" />
-                  )}
-                </button>
-
-                {/* Recruiter Option */}
-                <button
-                  type="button"
-                  onClick={() => setRoleHandler("Recruiter")}
-                  className={`relative flex items-center justify-center gap-2 p-3 rounded-xl border text-sm font-medium transition-all ${
-                    input.role === "Recruiter"
-                      ? "border-indigo-600 bg-indigo-50/80 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 ring-2 ring-indigo-600/20"
-                      : "border-slate-200 dark:border-slate-700 bg-slate-50/30 dark:bg-slate-800/30 text-slate-600 dark:text-slate-400 hover:bg-slate-100/60 dark:hover:bg-slate-800"
-                  }`}
-                >
-                  <Briefcase className="w-4 h-4" />
-                  <span>Recruiter</span>
-                  {input.role === "Recruiter" && (
-                    <CheckCircle2 className="w-3.5 h-3.5 absolute top-2 right-2 text-indigo-600 dark:text-indigo-400" />
                   )}
                 </button>
               </div>

@@ -66,14 +66,18 @@ export const register = async (req, res) => {
 
 export const login = async (req, res) => {
   try {
-    const { email, password, role } = req.body;
-    if (!email || !password || !role) {
+    const { email, password } = req.body;
+    if (!email || !password) {
       return res
         .status(400)
         .json({ message: "Missing the required field", success: false });
     }
 
-    let user = await User.findOne({ email });
+    const trimmedEmail = email.trim();
+    const escapedEmail = trimmedEmail.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    let user = await User.findOne({
+      email: { $regex: new RegExp(`^${escapedEmail}$`, "i") },
+    });
     if (!user) {
       return res
         .status(400)
@@ -85,13 +89,6 @@ export const login = async (req, res) => {
       return res
         .status(400)
         .json({ message: "Incorrect Email or Password!", success: false });
-    }
-
-    if (role !== user.role) {
-      return res.status(400).json({
-        message: "Account doesn't exist with current role!",
-        success: false,
-      });
     }
 
     const tokenData = {

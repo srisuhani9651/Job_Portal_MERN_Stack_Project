@@ -149,7 +149,7 @@ Supports combined multi-category filtering:
 User submits Login Form
   │
   ▼
-Frontend dispatches axios.post('/api/v1/user/login', { email, password, role }, { withCredentials: true })
+Frontend dispatches axios.post('/api/v1/user/login', { email, password }, { withCredentials: true })
   │
   ▼
 Backend validates credentials, signs JWT, and responds with HTTP-only cookie + user object
